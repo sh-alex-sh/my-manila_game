@@ -1,0 +1,23 @@
+{
+  "name": "@manila/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@manila/engine": "workspace:*",
+    "express": "^5.1.0",
+    "socket.io": "^4.8.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.17",
+    "typescript": "^5.8.0",
+    "tsx": "^4.19.0"
+  }
+}

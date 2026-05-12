@@ -1,0 +1,15 @@
+{
+  "name": "manila-game",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:client": "pnpm --filter @manila/client dev",
+    "dev:server": "pnpm --filter @manila/server dev",
+    "build": "pnpm --filter @manila/engine build && pnpm --filter @manila/client build && pnpm --filter @manila/server build",
+    "test": "pnpm --filter @manila/engine test",
+    "lint": "pnpm -r lint"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
+}
