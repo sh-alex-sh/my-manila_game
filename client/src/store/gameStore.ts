@@ -11,6 +11,7 @@ interface GameStore {
   turnLabel: string;
   gameLog: string[];
   localPlayerIndex: number;
+  gameEndedReason: string | null;
 
   setGameState: (state: GameState) => void;
   setValidActions: (actions: ValidAction[]) => void;
@@ -18,6 +19,7 @@ interface GameStore {
   setMyTurn: (isMy: boolean) => void;
   setPhaseLabel: (label: string) => void;
   addLog: (msg: string) => void;
+  setGameEndedReason: (reason: string | null) => void;
   reset: () => void;
 }
 
@@ -31,6 +33,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   turnLabel: '',
   gameLog: [],
   localPlayerIndex: 0,
+  gameEndedReason: null,
 
   setGameState: (state) => set({ gameState: state }),
 
@@ -45,6 +48,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   addLog: (msg) =>
     set((s) => ({ gameLog: [...s.gameLog, `[${new Date().toLocaleTimeString()}] ${msg}`] })),
 
+  setGameEndedReason: (reason) => set({ gameEndedReason: reason }),
+
   reset: () =>
     set({
       gameState: null,
@@ -55,5 +60,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       turnLabel: '',
       gameLog: [],
       localPlayerIndex: 0,
+      gameEndedReason: null,
     }),
 }));

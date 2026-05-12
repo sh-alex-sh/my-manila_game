@@ -4,6 +4,7 @@ import { GamePhase } from '@manila/engine';
 import { useGameStore } from '../store/gameStore.js';
 import { useLocalGame } from '../hooks/useLocalGame.js';
 import { useOnlineGame } from '../hooks/useOnlineGame.js';
+import { getSocket } from '../socket/socket.js';
 import { GameBoard } from '../components/board/GameBoard.js';
 import { AuctionPanel } from '../components/action-panels/AuctionPanel.js';
 import { SetupPanel } from '../components/action-panels/SetupPanel.js';
@@ -12,6 +13,44 @@ import { DicePanel } from '../components/action-panels/DicePanel.js';
 import { PilotPanel } from '../components/action-panels/PilotPanel.js';
 import { PiratePanel } from '../components/action-panels/PiratePanel.js';
 import { SettlementPanel } from '../components/SettlementPanel.js';
+
+function GameEndedModal({ reason, onConfirm }: { reason: string; onConfirm: () => void }) {
+  return (
+    <div
+      style={{
+        position: 'fixed', inset: 0, zIndex: 2000,
+        background: 'rgba(0,0,0,0.7)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: 'sans-serif',
+      }}
+    >
+      <div
+        style={{
+          background: '#0a2a3a', borderRadius: '12px', padding: '32px 40px',
+          border: '1px solid #f0c040', maxWidth: '400px', width: '90%',
+          textAlign: 'center',
+        }}
+      >
+        <div style={{ color: '#f0c040', fontSize: '1.2em', fontWeight: 'bold', marginBottom: '16px' }}>
+          游戏结束
+        </div>
+        <div style={{ color: '#ddd', fontSize: '1em', marginBottom: '24px', lineHeight: 1.6 }}>
+          {reason}
+        </div>
+        <button
+          onClick={onConfirm}
+          style={{
+            padding: '10px 32px', background: '#f0c040', color: '#1a1a1a',
+            border: 'none', borderRadius: '6px', cursor: 'pointer',
+            fontWeight: 'bold', fontSize: '1em',
+          }}
+        >
+          确认
+        </button>
+      </div>
+    </div>
+  );
+}
 
 interface LocationState {
   playerNames?: string[];
@@ -102,6 +141,15 @@ export function GamePage() {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#1a3a4a', color: '#fff', fontFamily: 'sans-serif' }}>
         <div>加载中...</div>
         <div style={{ marginTop: 12, fontSize: '0.8em', color: '#8a9aaa' }}>Debug: {debugInfo}</div>
+        {store.gameEndedReason && (
+          <GameEndedModal
+            reason={store.gameEndedReason}
+            onConfirm={() => {
+              useGameStore.getState().setGameEndedReason(null);
+              navigate('/lobby');
+            }}
+          />
+        )}
       </div>
     );
   }
@@ -217,7 +265,10 @@ export function GamePage() {
             </div>
 
             <button
-              onClick={() => navigate('/')}
+              onClick={() => {
+                if (isOnline) getSocket().emit('room:leave');
+                navigate(isOnline ? '/lobby' : '/');
+              }}
               style={{
                 padding: '10px 20px',
                 background: '#f0c040',
@@ -274,7 +325,11 @@ export function GamePage() {
           {isOnline ? ' [联机]' : ''}
         </span>
         <button
-          onClick={() => navigate('/')}
+          onClick={() => {
+            if (isOnline) getSocket().emit('room:leave');
+            useGameStore.getState().reset();
+            navigate(isOnline ? '/lobby' : '/');
+          }}
           style={{
             padding: '6px 12px',
             background: '#3a5a6a',
@@ -546,6 +601,17 @@ export function GamePage() {
           onClose={() => {
             setDismissedRound(gs.lastSettlement!.roundNumber);
             setShowSettlement(false);
+          }}
+        />
+      )}
+
+      {/* Game ended modal (online: player left, game over) */}
+      {store.gameEndedReason && (
+        <GameEndedModal
+          reason={store.gameEndedReason}
+          onConfirm={() => {
+            useGameStore.getState().setGameEndedReason(null);
+            navigate('/lobby');
           }}
         />
       )}

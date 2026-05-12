@@ -133,6 +133,10 @@ function handleLeaveRoom(socket: any) {
   const room = RoomManager.getRoomBySocket(socket.id);
   if (!room) return;
 
+  // Get player info before removal
+  const leavingPlayer = room.getConnections().find((c: any) => c.socketId === socket.id);
+  const leavingPlayerName = leavingPlayer?.playerName || '未知玩家';
+
   const wasPlaying = room.getState() === 'playing';
 
   room.leave(socket.id);
@@ -141,10 +145,14 @@ function handleLeaveRoom(socket: any) {
 
   // If the game was in progress, notify remaining players
   if (wasPlaying) {
-    io.to(room.id).emit('game:ended', { reason: '房主已离开', roomId: room.id });
+    io.to(room.id).emit('game:ended', {
+      reason: `${leavingPlayerName} 退出了游戏`,
+      roomId: room.id,
+      playerName: leavingPlayerName,
+    });
     // Remove room immediately since the game is abandoned
     RoomManager.remove(room.id);
-    console.log(`Room ${room.id} removed (host left during game)`);
+    console.log(`Room ${room.id} removed (${leavingPlayerName} left during game)`);
   } else if (room.getPlayerCount() === 0) {
     RoomManager.remove(room.id);
     console.log(`Room ${room.id} removed (empty)`);

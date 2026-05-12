@@ -242,9 +242,7 @@ export class GameEngine {
         break;
       }
       case GamePhase.PLACEMENT: {
-        const order = this.state.reversedOrder
-          ? [...this.state.turnOrder].reverse()
-          : this.state.turnOrder;
+        const order = this.state.turnOrder;
         const curIdx = order.indexOf(this.state.turnOrder[this.state.currentPlayerIndex]);
         const startIdx = advance ? (curIdx + 1) % order.length : order.indexOf(this.state.harborMasterId ?? order[0]);
         let found: string | null = null;

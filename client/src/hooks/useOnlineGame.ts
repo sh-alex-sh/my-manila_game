@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ActionValidator, GamePhase } from '@manila/engine';
 import type { GameState } from '@manila/engine';
 import { useGameStore } from '../store/gameStore.js';
@@ -21,7 +20,6 @@ const phaseNames: Record<string, string> = {
 export function useOnlineGame(initialGameState?: GameState) {
   const socket = getSocket();
   const registered = useRef(false);
-  const navigate = useNavigate();
 
   // Use getState() inside callbacks instead of hook subscription to avoid
   // creating a dependency cycle that causes infinite re-renders
@@ -58,12 +56,17 @@ export function useOnlineGame(initialGameState?: GameState) {
   );
 
   useEffect(() => {
+    console.log('[USEONLINEGAME] Effect running', {
+      registered: registered.current,
+      hasInitialState: !!initialGameState,
+    });
     if (registered.current) return;
     registered.current = true;
 
     // Apply initial state from route BEFORE registering handlers
     // so there's no race between init and socket events
     if (initialGameState) {
+      console.log('[USEONLINEGAME] Applying initial state');
       applyState(initialGameState);
     }
 
@@ -80,11 +83,11 @@ export function useOnlineGame(initialGameState?: GameState) {
       console.error('[ONLINE] game:error', err.message);
     };
 
-    const handleGameEnded = (_data: { reason: string; roomId: string }) => {
-      console.log('[ONLINE] game:ended', _data);
+    const handleGameEnded = (data: { reason: string; roomId: string }) => {
+      console.log('[ONLINE] game:ended', data);
       useGameStore.getState().reset();
       setSocketYourPlayerId(null);
-      navigate('/');
+      useGameStore.getState().setGameEndedReason(data.reason || '游戏已结束');
     };
 
     socket.on('game:started', handleGameState);

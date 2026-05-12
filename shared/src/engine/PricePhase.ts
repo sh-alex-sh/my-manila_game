@@ -3,6 +3,13 @@ import { SHIP_POSITION_MAX } from '../utils/Constants.js';
 
 const PRICES = [0, 5, 10, 20, 30];
 
+const GOODS_LABELS: Record<string, string> = {
+  jade: '翡翠',
+  silk: '丝绸',
+  spices: '香料',
+  porcelain: '瓷器',
+};
+
 export class PricePhase {
   static execute(state: GameState): { gameOver: boolean; reason?: string } {
     console.log('[PRICE_PHASE] execute', {
@@ -30,7 +37,8 @@ export class PricePhase {
     // Check if any price reached 30
     for (const marker of state.priceMarkers) {
       if (marker.value >= 30) {
-        return { gameOver: true, reason: `${marker.goodsType} 价格达到30比索` };
+        const label = GOODS_LABELS[marker.goodsType] || marker.goodsType;
+return { gameOver: true, reason: `${label} 价格达到30比索` };
       }
     }
 
