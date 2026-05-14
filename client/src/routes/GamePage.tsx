@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { GamePhase } from '@manila/engine';
+import { GamePhase, ActionType } from '@manila/engine';
 import { useGameStore } from '../store/gameStore.js';
 import { useLocalGame } from '../hooks/useLocalGame.js';
 import { useOnlineGame } from '../hooks/useOnlineGame.js';
@@ -86,12 +86,12 @@ export function GamePage() {
 
   const gs = store.gameState;
 
-  // Show settlement screen when a new voyage settlement appears
+  // Show settlement screen when a new voyage settlement appears (after player confirms)
   useEffect(() => {
-    if (gs?.lastSettlement && gs.lastSettlement.roundNumber !== dismissedRound) {
+    if (gs?.lastSettlement && gs.lastSettlement.roundNumber !== dismissedRound && gs.phase !== GamePhase.PROFIT_DISTRIBUTION) {
       setShowSettlement(true);
     }
-  }, [gs?.lastSettlement, dismissedRound]);
+  }, [gs?.lastSettlement, dismissedRound, gs?.phase]);
 
   const currentPlayer = gs?.players[store.localPlayerIndex] ?? null;
 
@@ -193,6 +193,52 @@ export function GamePage() {
       case GamePhase.PILOT_ADJUSTMENT:
         return <PilotPanel actions={actions} onExecute={handleAction} />;
       case GamePhase.PROFIT_DISTRIBUTION:
+        if (gs.lastSettlement && !gs.profitState?.playerConfirmed) {
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ fontWeight: 'bold', color: '#f0c040', fontSize: '1.1em' }}>
+                航程结束
+              </div>
+              <div style={{ color: '#8a9aaa', fontSize: '0.85em' }}>
+                第三轮结束，请查看船只最终位置，确认后进入结算
+              </div>
+              <div style={{
+                display: 'flex', gap: '6px', padding: '8px', background: 'rgba(0,0,0,0.2)',
+                borderRadius: '6px',
+              }}>
+                {gs.ships.map((ship, i) => {
+                  const labels: Record<string, string> = { jade: '翡翠', silk: '丝绸', spices: '香料', porcelain: '瓷器' };
+                  const colors: Record<string, string> = { jade: '#2ecc71', silk: '#e74c3c', spices: '#e67e22', porcelain: '#3498db' };
+                  const goodsLabel = labels[ship.goodsType] || ship.goodsType;
+                  const color = colors[ship.goodsType] || '#888';
+                  return (
+                    <div key={i} style={{
+                      flex: 1, padding: '8px', borderRadius: '6px',
+                      background: 'rgba(0,0,0,0.3)', textAlign: 'center',
+                      border: ship.reachedManila ? '1px solid #3aba4a' : '1px solid #6a3a3a',
+                    }}>
+                      <div style={{ color, fontWeight: 'bold', fontSize: '0.9em' }}>{goodsLabel}</div>
+                      <div style={{ fontSize: '0.8em', color: '#aaa' }}>位置: {ship.position}</div>
+                      <div style={{ fontSize: '0.75em', color: ship.reachedManila ? '#3aba4a' : '#da3a4a' }}>
+                        {ship.reachedManila ? '✓ 到港' : ship.isWrecked ? '✗ 失事' : '未到港'}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <button
+                onClick={() => handleAction({ type: ActionType.CONFIRM_SETTLEMENT })}
+                style={{
+                  padding: '12px', background: '#f0c040', color: '#1a1a1a',
+                  border: 'none', borderRadius: '8px', cursor: 'pointer',
+                  fontWeight: 'bold', fontSize: '1em', letterSpacing: '4px',
+                }}
+              >
+                确认结算
+              </button>
+            </div>
+          );
+        }
         return (
           <div style={{ color: '#3aba4a', fontWeight: 'bold' }}>
             利润分配完成，准备下一航程...

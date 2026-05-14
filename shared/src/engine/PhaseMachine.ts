@@ -106,6 +106,7 @@ export class PhaseMachine {
           insurerId: null,
           playerExpenses: [],
           complete: false,
+          playerConfirmed: false,
         };
         break;
 

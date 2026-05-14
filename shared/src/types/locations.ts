@@ -44,6 +44,8 @@ export interface ProfitState {
   insurerId: string | null;
   playerExpenses: PlayerRoundExpense[];
   complete: boolean;
+  /** Set when a player clicks the settlement confirmation button */
+  playerConfirmed: boolean;
 }
 
 export interface PlayerRoundExpense {

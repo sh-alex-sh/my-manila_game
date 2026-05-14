@@ -55,6 +55,7 @@ export enum ActionType {
   PAWN_SHARE = 'pawn_share',
   REDEEM_SHARE = 'redeem_share',
   USE_BLIND_PASSENGER = 'use_blind_passenger',
+  CONFIRM_SETTLEMENT = 'confirm_settlement',
 }
 
 export enum PlacementRound {

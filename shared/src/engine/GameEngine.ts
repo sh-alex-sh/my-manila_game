@@ -71,6 +71,13 @@ export class GameEngine {
       case GamePhase.PILOT_ADJUSTMENT:
         return PilotEngine.execute(this.state, action);
 
+      case GamePhase.PROFIT_DISTRIBUTION:
+        if (action.type === ActionType.CONFIRM_SETTLEMENT) {
+          this.state.profitState!.playerConfirmed = true;
+          return { success: true };
+        }
+        return { success: false, error: '当前阶段不支持此操作' };
+
       default:
         return { success: false, error: `阶段 ${this.state.phase} 不支持此操作` };
     }
@@ -185,7 +192,7 @@ export class GameEngine {
         break;
 
       case GamePhase.PROFIT_DISTRIBUTION:
-        if (this.state.profitState?.complete) {
+        if (this.state.profitState?.playerConfirmed) {
           PhaseMachine.transition(this.state, GamePhase.PRICE_INCREASE);
           this.emit({ type: 'phase_change', data: GamePhase.PRICE_INCREASE, timestamp: Date.now() });
         }
@@ -298,7 +305,7 @@ export class GameEngine {
 
   /** Phases that auto-resolve without player input */
   private isAutoResolvePhase(phase: GamePhase): boolean {
-    return phase === GamePhase.PROFIT_DISTRIBUTION || phase === GamePhase.PRICE_INCREASE;
+    return phase === GamePhase.PRICE_INCREASE;
   }
 
   private goToProfit(): void {

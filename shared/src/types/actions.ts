@@ -19,7 +19,8 @@ export type ClientAction =
   | { type: ActionType.TAKE_INSURANCE; playerId: string }
   | { type: ActionType.PAWN_SHARE; playerId: string; goodsType: GoodsType }
   | { type: ActionType.REDEEM_SHARE; playerId: string; goodsType: GoodsType }
-  | { type: ActionType.USE_BLIND_PASSENGER; playerId: string; laneIndex: number; slotIndex: number; locationType: string };
+  | { type: ActionType.USE_BLIND_PASSENGER; playerId: string; laneIndex: number; slotIndex: number; locationType: string }
+  | { type: ActionType.CONFIRM_SETTLEMENT; playerId: string };
 
 export interface GameAction {
   id: string;

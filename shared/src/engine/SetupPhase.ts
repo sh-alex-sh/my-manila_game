@@ -72,10 +72,17 @@ export class SetupPhase {
     action: ClientAction & { type: ActionType.SELECT_GOODS },
     setup: NonNullable<GameState['harborMasterSetup']>,
   ): ActionResult {
-    // Allow selecting goods from both buy_share (skip buying) and select_goods step
+    // Allow skip from buy_share step (client sends SELECT_GOODS without buying)
     if (setup.step === 'buy_share') {
       setup.step = 'select_goods';
-    } else if (setup.step !== 'select_goods') {
+      // If no goods provided, it's just a skip - advance the step and return
+      if (action.goodsTypes.length !== 3) {
+        return { success: true };
+      }
+      // 3 goods provided along with skip-buy - fall through to process them
+    }
+
+    if (setup.step !== 'select_goods') {
       return { success: false, error: '当前步骤不能选择货物' };
     }
 

@@ -153,7 +153,6 @@ export class ProfitPhase {
     profitState.piratePayouts = piratePayouts;
     profitState.insurancePayouts = insurancePayouts;
     profitState.insurerId = insurerId;
-    profitState.complete = true;
   }
 
   private static computeExpenses(state: GameState): PlayerRoundExpense[] {
