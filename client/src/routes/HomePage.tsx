@@ -66,7 +66,7 @@ export function HomePage() {
       >
         <label style={{ fontSize: '0.9em', color: '#8a9aaa' }}>玩家人数</label>
         <div style={{ display: 'flex', gap: '8px' }}>
-          {[3, 4, 5].map((n) => (
+          {[2, 3, 4, 5].map((n) => (
             <button
               key={n}
               onClick={() => handlePlayerCountChange(n)}

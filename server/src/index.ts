@@ -91,7 +91,7 @@ io.on('connection', (socket) => {
 
     const state = room.startGame();
     if (!state) {
-      socket.emit('game:error', { code: 'NOT_ENOUGH_PLAYERS', message: '至少需要3名玩家' });
+      socket.emit('game:error', { code: 'NOT_ENOUGH_PLAYERS', message: '至少需要2名玩家' });
       return;
     }
 

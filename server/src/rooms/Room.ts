@@ -97,7 +97,7 @@ export class Room {
   }
 
   startGame(): GameState | null {
-    if (this.connections.length < 3) return null;
+    if (this.connections.length < 2) return null;
 
     const config: GameConfig = {
       playerCount: this.connections.length,

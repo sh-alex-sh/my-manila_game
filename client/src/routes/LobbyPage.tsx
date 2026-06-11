@@ -134,6 +134,7 @@ export function LobbyPage() {
           onChange={(e) => setMaxPlayers(Number(e.target.value))}
           style={{ padding: '10px', borderRadius: '6px', border: '1px solid #3a5a6a', background: '#0a2a3a', color: '#fff', marginRight: '8px' }}
         >
+          <option value={2}>2人</option>
           <option value={3}>3人</option>
           <option value={4}>4人</option>
           <option value={5}>5人</option>
